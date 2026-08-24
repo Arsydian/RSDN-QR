@@ -1,0 +1,131 @@
+/**
+ * RSDN-QR Studio Stylesheet
+ * Integrated with Arsydian Design System (arsydian.com)
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Arsydian Brand Color Palette */
+  --ars-red: #D82125;
+  --ars-red-600: #B81A1F;
+  --ars-red-700: #8F1317;
+  --ars-red-50: #FDECEC;
+  --ars-red-100: #F9D3D4;
+
+  --ars-black: #0C0A0B;
+  --ars-ink: #18171A;
+  --ars-graphite: #2A2A2E;
+  --ars-grey: #807F84;
+  --ars-grey-600: #5F5E63;
+  --ars-grey-400: #9E9DA2;
+  --ars-grey-300: #C3C2C7;
+  --ars-grey-200: #DEDDE0;
+  --ars-grey-100: #EDECEE;
+  --ars-grey-50: #F6F5F7;
+  --ars-white: #FFFFFF;
+  --ars-paper: #FAFAFB;
+
+  /* Functional Status */
+  --ars-success: #1F8A4C;
+  --ars-warning: #C98A12;
+  --ars-info: #2563A8;
+
+  /* Semantic UI Tokens */
+  --bg: var(--ars-paper);
+  --bg-raised: var(--ars-white);
+  --bg-sunken: var(--ars-grey-50);
+  --bg-inverse: var(--ars-black);
+  --bg-accent: var(--ars-red);
+
+  --fg: var(--ars-ink);
+  --fg-muted: var(--ars-grey-600);
+  --fg-subtle: var(--ars-grey-400);
+  --fg-inverse: var(--ars-white);
+  --fg-accent: var(--ars-red);
+
+  --border: var(--ars-grey-200);
+  --border-strong: var(--ars-grey-300);
+  --border-inverse: rgba(255, 255, 255, 0.14);
+
+  /* Typography */
+  --font-display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Transitions & Easing */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 0.15s;
+  --dur-base: 0.25s;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar for sleek UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ars-grey-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ars-grey-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ars-grey-400);
+}
+
+/* Technical Precision Card Styles */
+.ars-card {
+  background: var(--ars-white);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(12, 10, 11, 0.04), 0 1px 2px rgba(12, 10, 11, 0.02);
+  border-radius: 8px;
+}
+
+.ars-card-dark {
+  background: var(--ars-black);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+}
+
+/* Technical Badge */
+.ars-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Custom Range Input */
+input[type="range"] {
+  accent-color: var(--ars-red);
+}
+
+/* Input Focus Ring */
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--ars-red) !important;
+  box-shadow: 0 0 0 3px rgba(216, 33, 37, 0.15) !important;
+}

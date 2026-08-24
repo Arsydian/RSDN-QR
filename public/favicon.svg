@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="20" fill="#0C0A0B"/>
+  <!-- Top Left Eye -->
+  <rect x="16" y="16" width="28" height="28" rx="6" fill="#D82125"/>
+  <rect x="22" y="22" width="16" height="16" rx="3" fill="#0C0A0B"/>
+  <rect x="26" y="26" width="8" height="8" rx="2" fill="#D82125"/>
+  
+  <!-- Top Right Eye -->
+  <rect x="56" y="16" width="28" height="28" rx="6" fill="#FFFFFF"/>
+  <rect x="62" y="22" width="16" height="16" rx="3" fill="#0C0A0B"/>
+  <rect x="66" y="26" width="8" height="8" rx="2" fill="#FFFFFF"/>
+  
+  <!-- Bottom Left Eye -->
+  <rect x="16" y="56" width="28" height="28" rx="6" fill="#FFFFFF"/>
+  <rect x="22" y="62" width="16" height="16" rx="3" fill="#0C0A0B"/>
+  <rect x="26" y="66" width="8" height="8" rx="2" fill="#FFFFFF"/>
+  
+  <!-- Data modules -->
+  <circle cx="62" cy="62" r="4" fill="#D82125"/>
+  <circle cx="76" cy="62" r="4" fill="#D82125"/>
+  <circle cx="62" cy="76" r="4" fill="#FFFFFF"/>
+  <circle cx="76" cy="76" r="4" fill="#D82125"/>
+  <circle cx="48" cy="48" r="4" fill="#FFFFFF"/>
+</svg>
