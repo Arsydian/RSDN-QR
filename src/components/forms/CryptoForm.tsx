@@ -56,13 +56,6 @@ export const CryptoForm: React.FC<CryptoFormProps> = ({ data, onChange }) => {
             type="text"
             value={data.address}
             onChange={(e) => onChange({ ...data, address: e.target.value })}
-            placeholder={
-              data.currency === 'bitcoin'
-                ? 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq'
-                : data.currency === 'ethereum' || data.currency === 'usdt'
-                ? '0x71C...397'
-                : 'SolanaAddress...'
-            }
             className="block w-full pl-9 pr-3 py-2.5 text-xs bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-mono"
           />
         </div>

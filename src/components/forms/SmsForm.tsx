@@ -28,8 +28,7 @@ export const SmsForm: React.FC<SmsFormProps> = ({ data, onChange }) => {
             type="tel"
             value={data.phone}
             onChange={(e) => onChange({ ...data, phone: e.target.value })}
-            placeholder="+1 555 123 4567"
-            className="block w-full pl-9 pr-3 py-2.5 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-sans"
+            className="block w-full pl-9 pr-3 py-2.5 text-xs bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-mono"
           />
         </div>
       </div>

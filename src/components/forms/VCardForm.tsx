@@ -95,9 +95,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ data, onChange }) => {
             </div>
             <input
               type="tel"
-              value={data.phoneMobile}
               onChange={(e) => onChange({ ...data, phoneMobile: e.target.value })}
-              placeholder="+1 (555) 123-4567"
               className="block w-full pl-9 pr-3 py-2 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-sans"
             />
           </div>
@@ -109,9 +107,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ data, onChange }) => {
           </label>
           <input
             type="tel"
-            value={data.phoneWork}
             onChange={(e) => onChange({ ...data, phoneWork: e.target.value })}
-            placeholder="+1 (555) 987-6543"
             className="block w-full px-3 py-2 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-sans"
           />
         </div>
@@ -129,9 +125,7 @@ export const VCardForm: React.FC<VCardFormProps> = ({ data, onChange }) => {
             </div>
             <input
               type="email"
-              value={data.email}
               onChange={(e) => onChange({ ...data, email: e.target.value })}
-              placeholder="name@arsydian.com"
               className="block w-full pl-9 pr-3 py-2 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-sans"
             />
           </div>
