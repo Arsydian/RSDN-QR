@@ -70,7 +70,6 @@ export const CryptoForm: React.FC<CryptoFormProps> = ({ data, onChange }) => {
             type="text"
             value={data.amount}
             onChange={(e) => onChange({ ...data, amount: e.target.value })}
-            placeholder="0.05"
             className="block w-full px-3 py-2 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-mono"
           />
         </div>
@@ -83,7 +82,6 @@ export const CryptoForm: React.FC<CryptoFormProps> = ({ data, onChange }) => {
             type="text"
             value={data.message}
             onChange={(e) => onChange({ ...data, message: e.target.value })}
-            placeholder="Invoice #1042"
             className="block w-full px-3 py-2 text-sm bg-ars-white border border-ars-grey-200 rounded-lg text-ars-ink placeholder:text-ars-grey-400 focus:border-ars-red transition-all font-sans"
           />
         </div>
