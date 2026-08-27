@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { QrCode, Layers, ShieldCheck } from 'lucide-react';
-import { ARSYDIAN_MARK_DATA_URI } from '../../utils/arsydianBrandAssets';
+import { ARSYDIAN_MARK_INVERTED_DATA_URI } from '../../utils/arsydianBrandAssets';
 
 interface HeaderProps {
   activeMode: 'single' | 'batch';
@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-ars-black flex items-center justify-center shadow-ars-sm border border-ars-ink p-1">
             <img
-              src={ARSYDIAN_MARK_DATA_URI}
+              src={ARSYDIAN_MARK_INVERTED_DATA_URI}
               alt="Arsydian Brand Mark"
               className="w-full h-full object-contain"
             />

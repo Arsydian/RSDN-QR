@@ -4,7 +4,12 @@
  * logo overlays in QR codes (Official Arsydian Brand Mark & Full Logo, Social, Network, Crypto, Contact).
  */
 
-import { ARSYDIAN_MARK_DATA_URI, ARSYDIAN_LOGO_FULL_DATA_URI } from './arsydianBrandAssets';
+import {
+  ARSYDIAN_MARK_DATA_URI,
+  ARSYDIAN_MARK_INVERTED_DATA_URI,
+  ARSYDIAN_LOGO_FULL_DATA_URI,
+  ARSYDIAN_LOGO_FULL_INVERTED_DATA_URI,
+} from './arsydianBrandAssets';
 
 export interface PresetIcon {
   id: string;
@@ -22,15 +27,27 @@ function svgToDataUri(svgContent: string): string {
 export const BUILT_IN_ICONS: PresetIcon[] = [
   {
     id: 'arsydian-mark',
-    name: 'Arsydian Mark',
+    name: 'Arsydian Mark (Light)',
     category: 'arsydian',
     svgDataUri: ARSYDIAN_MARK_DATA_URI,
   },
   {
+    id: 'arsydian-mark-inverted',
+    name: 'Arsydian Mark (Dark)',
+    category: 'arsydian',
+    svgDataUri: ARSYDIAN_MARK_INVERTED_DATA_URI,
+  },
+  {
     id: 'arsydian-logo-full',
-    name: 'Arsydian Full Logo',
+    name: 'Arsydian Full Logo (Light)',
     category: 'arsydian',
     svgDataUri: ARSYDIAN_LOGO_FULL_DATA_URI,
+  },
+  {
+    id: 'arsydian-logo-full-inverted',
+    name: 'Arsydian Full Logo (Dark)',
+    category: 'arsydian',
+    svgDataUri: ARSYDIAN_LOGO_FULL_INVERTED_DATA_URI,
   },
   {
     id: 'globe',
