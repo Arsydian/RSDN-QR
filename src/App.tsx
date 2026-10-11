@@ -28,6 +28,7 @@ import { analyzeScannability } from './utils/scannability';
 // Layout & Forms
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { TypeSelector } from './components/forms/TypeSelector';
 import { UrlForm } from './components/forms/UrlForm';
 import { TextForm } from './components/forms/TextForm';
@@ -260,11 +261,20 @@ export function App() {
 
             {/* Right Column: Sticky Live Preview & Health Meter (5 cols) */}
             <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
-              <QrPreviewPanel
-                payloadString={activePayloadString}
-                design={design}
-                scannabilityReport={scannabilityReport}
-              />
+              <ErrorBoundary
+                resetKeys={[activePayloadString, design]}
+                fallback={
+                  <div className="ars-card p-5 text-center text-xs text-ars-grey-600" role="alert">
+                    The preview hit an error. Change the content or design to try again.
+                  </div>
+                }
+              >
+                <QrPreviewPanel
+                  payloadString={activePayloadString}
+                  design={design}
+                  scannabilityReport={scannabilityReport}
+                />
+              </ErrorBoundary>
             </div>
           </div>
         )}

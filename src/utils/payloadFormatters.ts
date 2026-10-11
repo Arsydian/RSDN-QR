@@ -77,10 +77,10 @@ export function formatUrl(payload: UrlPayload): string {
 /**
  * Formats Plain Text payload.
  * @param payload Text form data.
- * @returns Raw text string.
+ * @returns Raw text string, or '' if it is blank.
  */
 export function formatText(payload: TextPayload): string {
-  return payload.text;
+  return payload.text.trim() ? payload.text : '';
 }
 
 /**
@@ -125,9 +125,10 @@ export function formatSms(payload: SmsPayload): string {
  * Formats Wi-Fi Network credentials into standard WIFI: protocol.
  * Spec: WIFI:T:<WPA|WEP|nopass>;S:<SSID>;P:<PASSWORD>;H:<true|false>;;
  * @param payload Wi-Fi form data.
- * @returns WIFI protocol string.
+ * @returns WIFI protocol string, or '' if no network name is set.
  */
 export function formatWifi(payload: WifiPayload): string {
+  if (!payload.ssid.trim()) return '';
   const ssid = escapeSpecialChars(payload.ssid);
   const password = payload.encryption === 'nopass' ? '' : escapeSpecialChars(payload.password);
   const enc = payload.encryption || 'WPA';
@@ -140,9 +141,10 @@ export function formatWifi(payload: WifiPayload): string {
  * Formats Contact Card into standard vCard 3.0 format.
  * Compatible with iOS Contacts, Android Google Contacts, and desktop address books.
  * @param payload vCard form data.
- * @returns Serialized vCard 3.0 string.
+ * @returns Serialized vCard 3.0 string, or '' if every field is blank.
  */
 export function formatVCard(payload: VCardPayload): string {
+  if (!Object.values(payload).some((value) => value.trim())) return '';
   const lines: string[] = [
     'BEGIN:VCARD',
     'VERSION:3.0',
@@ -221,16 +223,17 @@ export function formatCrypto(payload: CryptoPayload): string {
 /**
  * Formats Calendar Event into standard iCal / VEVENT block.
  * @param payload Event form data.
- * @returns iCalendar string.
+ * @returns iCalendar string, or '' if there is no title or start time.
  */
 export function formatEvent(payload: EventPayload): string {
+  const start = formatICalDate(payload.startDate);
+  const end = formatICalDate(payload.endDate);
+  if (!payload.title.trim() && !start) return '';
+
   const lines: string[] = [
     'BEGIN:VEVENT',
     `SUMMARY:${escapeSpecialChars(payload.title)}`,
   ];
-
-  const start = formatICalDate(payload.startDate);
-  const end = formatICalDate(payload.endDate);
 
   if (start) lines.push(`DTSTART:${start}`);
   if (end) lines.push(`DTEND:${end}`);

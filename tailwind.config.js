@@ -45,7 +45,16 @@ export default {
         'ars-md': '0 8px 20px rgba(12, 10, 11, 0.08), 0 2px 6px rgba(12, 10, 11, 0.05)',
         'ars-lg': '0 20px 40px rgba(12, 10, 11, 0.1), 0 4px 10px rgba(12, 10, 11, 0.05)',
         'ars-accent': '0 10px 24px rgba(216, 33, 37, 0.25)',
-      }
+      },
+      keyframes: {
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 150ms ease-out',
+      },
     },
   },
   plugins: [],

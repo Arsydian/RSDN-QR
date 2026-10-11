@@ -7,22 +7,32 @@
 
 import QRCodeStyling, { Options } from 'qr-code-styling';
 import { QrDesignConfig, ExportFormat } from '../types/qr';
+import { toUtf8ByteString } from './qrEncoding';
+
+/**
+ * Pixel size of the live preview. Margins in the design config are expressed at this
+ * size and scaled proportionally for exports, so every export matches the preview.
+ */
+export const PREVIEW_SIZE = 300;
 
 /**
  * Transforms application design configuration into `qr-code-styling` Options object.
  * Strictly isolates gradients and image paths so reverting styles does not leave stale state.
  *
- * @param data The serialized QR payload string.
+ * @param data The serialized QR payload string. Must be non-empty.
  * @param design Visual styling parameters.
  * @param targetSize Pixel dimension for rendering (e.g. 300 for preview, 2048 for export).
+ * @param format Export format. JPEG has no transparency, so it always gets a solid background.
  * @returns Formatted Options object for QRCodeStyling.
  */
 export function buildQrOptions(
   data: string,
   design: QrDesignConfig,
-  targetSize?: number
+  targetSize?: number,
+  format?: ExportFormat
 ): Options {
-  const size = targetSize || design.width || 360;
+  const size = targetSize || PREVIEW_SIZE;
+  const scale = size / PREVIEW_SIZE;
 
   // Body dots configuration
   const dotsOptions: Options['dotsOptions'] = {
@@ -79,18 +89,17 @@ export function buildQrOptions(
     };
   }
 
-  // Background Options
+  // Background Options (a transparent JPEG would render with a black background)
+  const transparent = design.backgroundOptions.isTransparent && format !== 'jpeg';
   const backgroundOptions: Options['backgroundOptions'] = {
-    color: design.backgroundOptions.isTransparent
-      ? 'transparent'
-      : design.backgroundOptions.color || '#FFFFFF',
+    color: transparent ? 'transparent' : design.backgroundOptions.color || '#FFFFFF',
   };
 
   // Image / Logo Options
   const imageOptions: Options['imageOptions'] = {
     hideBackgroundDots: design.imageOptions.hideBackgroundDots,
     imageSize: design.imageOptions.size,
-    margin: design.imageOptions.margin,
+    margin: Math.round(design.imageOptions.margin * scale),
     crossOrigin: 'anonymous',
   };
 
@@ -98,8 +107,8 @@ export function buildQrOptions(
     width: size,
     height: size,
     type: 'canvas',
-    data: data || 'https://arsydian.com',
-    margin: design.margin,
+    data: toUtf8ByteString(data),
+    margin: Math.round(design.margin * scale),
     qrOptions: {
       errorCorrectionLevel: design.errorCorrectionLevel,
     },
@@ -123,14 +132,16 @@ export function buildQrOptions(
  * @param data The payload string.
  * @param design The styling configuration.
  * @param size Target resolution/size.
+ * @param format Export format, if exporting.
  * @returns Configured QRCodeStyling instance.
  */
 export function createQrInstance(
   data: string,
   design: QrDesignConfig,
-  size?: number
+  size?: number,
+  format?: ExportFormat
 ): QRCodeStyling {
-  const options = buildQrOptions(data, design, size);
+  const options = buildQrOptions(data, design, size, format);
   return new QRCodeStyling(options);
 }
 
@@ -150,19 +161,11 @@ export async function downloadQrCode(
   format: ExportFormat,
   resolution: number
 ): Promise<void> {
-  const exportInstance = createQrInstance(data, design, resolution);
-  
-  if (format === 'svg') {
-    await exportInstance.download({
-      name: filename || 'rsdn-qr-code',
-      extension: 'svg',
-    });
-  } else {
-    await exportInstance.download({
-      name: filename || 'rsdn-qr-code',
-      extension: format,
-    });
-  }
+  const exportInstance = createQrInstance(data, design, resolution, format);
+  await exportInstance.download({
+    name: filename || 'rsdn-qr-code',
+    extension: format,
+  });
 }
 
 /**
@@ -180,8 +183,8 @@ export async function getQrBlob(
   format: ExportFormat,
   resolution: number = 1024
 ): Promise<Blob | null> {
-  const exportInstance = createQrInstance(data, design, resolution);
-  const raw = await exportInstance.getRawData(format === 'svg' ? 'svg' : format);
+  const exportInstance = createQrInstance(data, design, resolution, format);
+  const raw = await exportInstance.getRawData(format);
   if (!raw) return null;
   return raw as Blob;
 }

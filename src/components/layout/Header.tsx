@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
           <div className="bg-ars-grey-50 p-1 rounded-lg border border-ars-grey-200 flex items-center">
             <button
               onClick={() => onModeChange('single')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
                 activeMode === 'single'
                   ? 'bg-ars-white text-ars-black shadow-ars-xs border border-ars-grey-200'
                   : 'text-ars-grey-600 hover:text-ars-black'
@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
             </button>
             <button
               onClick={() => onModeChange('batch')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
                 activeMode === 'batch'
                   ? 'bg-ars-white text-ars-black shadow-ars-xs border border-ars-grey-200'
                   : 'text-ars-grey-600 hover:text-ars-black'

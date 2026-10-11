@@ -126,6 +126,18 @@ describe('Payload Formatters', () => {
     expect(event).toContain('END:VEVENT');
   });
 
+  it('returns an empty payload for blank forms', () => {
+    expect(formatText({ text: '   ' })).toBe('');
+    expect(formatWifi({ ssid: '', password: 'secret', encryption: 'WPA', hidden: false })).toBe('');
+    expect(formatVCard({
+      firstName: '', lastName: '', organization: '', title: '', phoneMobile: '', phoneWork: '',
+      email: '', url: '', street: '', city: '', state: '', zip: '', country: '', note: ' ',
+    })).toBe('');
+    expect(formatEvent({ title: '', startDate: '', endDate: '', location: 'Room 1', description: '' })).toBe('');
+    expect(formatEvent({ title: '', startDate: '2026-09-01T10:00', endDate: '', location: '', description: '' }))
+      .toContain('DTSTART:');
+  });
+
   it('dispatches serialized payload correctly through serializeQrPayload', () => {
     const state: QrPayloadState = {
       url: { url: 'https://arsydian.com' },

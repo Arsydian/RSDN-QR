@@ -6,6 +6,7 @@
  */
 
 import { QrDesignConfig, ScannabilityResult, HealthRating } from '../types/qr';
+import { getQrCapacity } from './qrEncoding';
 
 /** Maximum data recovery capacity per Error Correction Level */
 const ERROR_CORRECTION_CAPACITY: Record<string, number> = {
@@ -149,6 +150,15 @@ export function analyzeScannability(
   } else if (charCount > 350 && (ecLevel === 'H' || ecLevel === 'Q')) {
     score -= 10;
     recommendations.push('Dense payload with High error correction. Code will have many small dots; ensure high resolution when printing.');
+  }
+
+  const capacity = getQrCapacity(payloadString, ecLevel);
+  if (!capacity.fits) {
+    score = 0;
+    dataDensitySafe = false;
+    recommendations.unshift(
+      `Critical: Too much content for a QR code at Error Correction ${ecLevel} (${capacity.used.toLocaleString()} of ${capacity.max.toLocaleString()} ${capacity.unit}). Shorten the content or lower the error correction level.`
+    );
   }
 
   if (payloadString.length === 0) {

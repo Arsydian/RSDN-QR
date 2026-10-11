@@ -111,6 +111,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 </button>
               ))}
             </div>
+            {format === 'jpeg' && design.backgroundOptions.isTransparent && (
+              <p className="mt-2 text-[11px] text-ars-grey-600">
+                JPEG can&apos;t be transparent, so this file will use a solid{' '}
+                <span className="font-mono">{design.backgroundOptions.color || '#FFFFFF'}</span> background.
+                Choose PNG or SVG to keep transparency.
+              </p>
+            )}
           </div>
 
           {/* Resolution Selection (Only applies to raster PNG/JPEG) */}
