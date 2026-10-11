@@ -2,6 +2,7 @@
   "name": "rsdn-qr",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
   "type": "module",
   "description": "Customizable QR Code Studio with Arsydian Design System",
   "scripts": {
