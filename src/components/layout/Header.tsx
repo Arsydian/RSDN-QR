@@ -20,13 +20,17 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
         
         {/* Brand & Identity */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-ars-black flex items-center justify-center shadow-ars-sm border border-ars-ink p-1">
+          <a
+            href="https://arsydian.com"
+            title="Visit arsydian.com"
+            className="w-9 h-9 rounded-lg bg-ars-black flex items-center justify-center shadow-ars-sm border border-ars-ink p-1 transition-opacity hover:opacity-80"
+          >
             <img
               src={ARSYDIAN_MARK_INVERTED_DATA_URI}
-              alt="Arsydian Brand Mark"
+              alt="Arsydian"
               className="w-full h-full object-contain"
             />
-          </div>
+          </a>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-display font-black text-xl tracking-tight text-ars-black">

@@ -55,7 +55,13 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-ars-grey-600 gap-4 font-sans">
-          <p>© {new Date().getFullYear()} RSDN-QR Studio. Built with the Arsydian Design System.</p>
+          <p>
+            © {new Date().getFullYear()} RSDN-QR Studio. Built by{' '}
+            <a href="https://arsydian.com" className="text-ars-grey-300 hover:text-ars-red transition-colors">
+              Arsydian
+            </a>
+            .
+          </p>
           <div className="flex items-center gap-6">
             <span className="hover:text-ars-grey-400 transition-colors">Static Cloudflare Pages Ready</span>
             <span className="hover:text-ars-grey-400 transition-colors">Client-Side Engine</span>
