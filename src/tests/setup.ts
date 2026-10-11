@@ -3,4 +3,4 @@
  * @description Vitest testing setup and DOM matchers.
  */
 
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
