@@ -270,7 +270,7 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
                   },
                 })
               }
-              className="rounded border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
+              className="rounded-sm border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
             />
             <label htmlFor={`${id}-hide-dots-bg`} className="text-xs font-sans text-ars-ink cursor-pointer">
               Clear QR dots beneath logo for clean visibility

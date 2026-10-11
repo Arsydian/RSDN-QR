@@ -111,7 +111,7 @@ export const WifiForm: React.FC<WifiFormProps> = ({ data, onChange }) => {
           id={`${id}-hidden`}
           checked={data.hidden}
           onChange={(e) => onChange({ ...data, hidden: e.target.checked })}
-          className="rounded border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
+          className="rounded-sm border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
         />
         <label htmlFor={`${id}-hidden`} className="text-xs text-ars-ink cursor-pointer font-sans">
           This is a hidden network (SSID is not broadcasted)

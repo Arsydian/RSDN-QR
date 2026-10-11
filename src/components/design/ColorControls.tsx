@@ -278,7 +278,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                     type="text"
                     value={design.dotsOptions.gradient?.colorStops[0]?.color || '#D82125'}
                     aria-label="Gradient start color hex value"
-                    className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
+                    className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-sm text-ars-ink font-mono uppercase w-24"
                     readOnly
                   />
                 </div>
@@ -313,7 +313,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                     type="text"
                     value={design.dotsOptions.gradient?.colorStops[1]?.color || '#0C0A0B'}
                     aria-label="Gradient end color hex value"
-                    className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
+                    className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-sm text-ars-ink font-mono uppercase w-24"
                     readOnly
                   />
                 </div>
@@ -344,7 +344,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                       },
                     })
                   }
-                  className="text-xs bg-ars-grey-50 border border-ars-grey-200 rounded px-2 py-1 text-ars-ink font-sans"
+                  className="text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-sm px-2 py-1 text-ars-ink font-sans"
                 >
                   <option value="linear">Linear Gradient</option>
                   <option value="radial">Radial Gradient</option>
@@ -446,7 +446,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                   },
                 })
               }
-              className="rounded border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
+              className="rounded-sm border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
             />
             <label htmlFor={`${id}-bg-transparent`} className="text-xs font-sans text-ars-ink cursor-pointer">
               Transparent Background (PNG / SVG)
@@ -515,7 +515,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                       },
                     })
                   }
-                  className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
+                  className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-sm text-ars-ink font-mono uppercase w-24"
                 />
               </div>
             </div>
@@ -553,7 +553,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                       },
                     })
                   }
-                  className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
+                  className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-sm text-ars-ink font-mono uppercase w-24"
                 />
               </div>
             </div>

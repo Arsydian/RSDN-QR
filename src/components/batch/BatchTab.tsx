@@ -155,7 +155,7 @@ export const BatchTab: React.FC<BatchTabProps> = ({ design }) => {
   return (
     <div className="space-y-6">
       {/* Introduction Card */}
-      <div className="ars-card p-6 bg-gradient-to-r from-ars-white to-ars-grey-50 border-ars-grey-200">
+      <div className="ars-card p-6 bg-linear-to-r from-ars-white to-ars-grey-50 border-ars-grey-200">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-lg bg-ars-black text-ars-red flex items-center justify-center shrink-0 shadow-ars-xs">
             <Layers className="w-5 h-5" aria-hidden="true" />
@@ -165,7 +165,7 @@ export const BatchTab: React.FC<BatchTabProps> = ({ design }) => {
               High-Volume Batch QR Generator
             </h2>
             <p className="text-xs text-ars-grey-600 mt-1 leading-relaxed">
-              Upload a CSV spreadsheet with URLs, codes, or contact payloads. RSDN-QR will apply your active design styling, generate each code in the browser, and compress them into a ready-to-use <code className="font-mono bg-ars-grey-200 px-1 py-0.5 rounded text-ars-black">.zip</code> archive.
+              Upload a CSV spreadsheet with URLs, codes, or contact payloads. RSDN-QR will apply your active design styling, generate each code in the browser, and compress them into a ready-to-use <code className="font-mono bg-ars-grey-200 px-1 py-0.5 rounded-sm text-ars-black">.zip</code> archive.
             </p>
           </div>
         </div>

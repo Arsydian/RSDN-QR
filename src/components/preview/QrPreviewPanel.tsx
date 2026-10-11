@@ -120,7 +120,7 @@ export const QrPreviewPanel: React.FC<QrPreviewPanelProps> = ({
           {/* Render target */}
           <div
             ref={containerRef}
-            className="flex items-center justify-center relative z-10 drop-shadow-sm transition-all duration-200"
+            className="flex items-center justify-center relative z-10 drop-shadow-xs transition-all duration-200"
           />
 
           {/* Placeholder states */}

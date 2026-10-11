@@ -32,7 +32,7 @@ export const ErrorCorrectionControls: React.FC<ErrorCorrectionControlsProps> = (
 
   return (
     <div className="space-y-3">
-      <div className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-1 flex items-center justify-between">
+      <div className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink flex items-center justify-between">
         <span id={`${id}-heading`} className="flex items-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
           Error Correction Level
