@@ -4,7 +4,7 @@
  * gradients with angle rotation, custom corner eye tints, and transparent backgrounds.
  */
 
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { QrDesignConfig, GradientType } from '../../types/qr';
 
@@ -62,6 +62,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
   design,
   onChange,
 }) => {
+  const id = useId();
   const [customCorners, setCustomCorners] = useState(
     design.cornersSquareOptions.color !== design.dotsOptions.color ||
     design.cornersDotOptions.color !== design.dotsOptions.color
@@ -127,11 +128,18 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
     <div className="space-y-6">
       {/* Quick Curated Palettes */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-ars-red" />
+        <p
+          id={`${id}-palettes`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2 flex items-center gap-1.5"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
           Arsydian Curated Palettes
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-palettes`}
+          className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+        >
           {PRESET_PALETTES.map((p) => (
             <button
               key={p.name}
@@ -139,7 +147,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
               onClick={() => applyPalette(p)}
               className="flex items-center gap-2 p-2 rounded-lg border border-ars-grey-200 bg-ars-white hover:border-ars-red hover:bg-ars-grey-50 text-left transition-all"
             >
-              <div className="flex -space-x-1 shrink-0">
+              <div className="flex -space-x-1 shrink-0" aria-hidden="true">
                 <div
                   className="w-4 h-4 rounded-full border border-white"
                   style={{ backgroundColor: p.body }}
@@ -164,12 +172,20 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
       {/* Body Color & Gradient Controls */}
       <div className="p-3.5 rounded-lg border border-ars-grey-200 bg-ars-white space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-display font-bold uppercase tracking-wider text-ars-ink">
+          <span
+            id={`${id}-body-fill`}
+            className="text-xs font-display font-bold uppercase tracking-wider text-ars-ink"
+          >
             Body Pattern Fill
-          </label>
-          <div className="flex items-center gap-1 bg-ars-grey-100 p-0.5 rounded-md border border-ars-grey-200 text-xs">
+          </span>
+          <div
+            role="group"
+            aria-labelledby={`${id}-body-fill`}
+            className="flex items-center gap-1 bg-ars-grey-100 p-0.5 rounded-md border border-ars-grey-200 text-xs"
+          >
             <button
               type="button"
+              aria-pressed={!design.dotsOptions.useGradient}
               onClick={() => handleGradientToggle(false)}
               className={`px-2 py-1 rounded font-display text-[11px] font-semibold transition-all ${
                 !design.dotsOptions.useGradient
@@ -181,6 +197,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
             </button>
             <button
               type="button"
+              aria-pressed={!!design.dotsOptions.useGradient}
               onClick={() => handleGradientToggle(true)}
               className={`px-2 py-1 rounded font-display text-[11px] font-semibold transition-all ${
                 design.dotsOptions.useGradient
@@ -207,6 +224,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                   },
                 })
               }
+              aria-label="Body pattern color"
               className="w-9 h-9 rounded-lg border border-ars-grey-300 cursor-pointer p-0.5"
             />
             <input
@@ -221,9 +239,11 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                   },
                 })
               }
+              aria-label="Body pattern color hex value"
+              aria-describedby={`${id}-body-hex-hint`}
               className="px-3 py-1.5 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded-lg text-ars-ink font-mono uppercase w-28 focus:border-ars-red"
             />
-            <span className="text-xs text-ars-grey-600">Hex color code</span>
+            <span id={`${id}-body-hex-hint`} className="text-xs text-ars-grey-600">Hex color code</span>
           </div>
         ) : (
           <div className="space-y-3 pt-2">
@@ -251,11 +271,13 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                         },
                       });
                     }}
+                    aria-label="Gradient start color"
                     className="w-8 h-8 rounded-lg border border-ars-grey-300 cursor-pointer p-0.5"
                   />
                   <input
                     type="text"
                     value={design.dotsOptions.gradient?.colorStops[0]?.color || '#D82125'}
+                    aria-label="Gradient start color hex value"
                     className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
                     readOnly
                   />
@@ -284,11 +306,13 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                         },
                       });
                     }}
+                    aria-label="Gradient end color"
                     className="w-8 h-8 rounded-lg border border-ars-grey-300 cursor-pointer p-0.5"
                   />
                   <input
                     type="text"
                     value={design.dotsOptions.gradient?.colorStops[1]?.color || '#0C0A0B'}
+                    aria-label="Gradient end color hex value"
                     className="px-2 py-1 text-xs bg-ars-grey-50 border border-ars-grey-200 rounded text-ars-ink font-mono uppercase w-24"
                     readOnly
                   />
@@ -299,8 +323,14 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
             {/* Gradient Type & Angle */}
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-display font-medium text-ars-grey-600">Style:</span>
+                <label
+                  htmlFor={`${id}-gradient-type`}
+                  className="text-[11px] font-display font-medium text-ars-grey-600"
+                >
+                  Style:
+                </label>
                 <select
+                  id={`${id}-gradient-type`}
                   value={design.dotsOptions.gradient?.type || 'linear'}
                   onChange={(e) =>
                     onChange({
@@ -323,7 +353,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
 
               {design.dotsOptions.gradient?.type === 'linear' && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-ars-grey-600">
+                  <span className="text-[11px] font-mono text-ars-grey-600" aria-hidden="true">
                     {design.dotsOptions.gradient.rotation}°
                   </span>
                   <input
@@ -331,6 +361,8 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                     min="0"
                     max="360"
                     value={design.dotsOptions.gradient.rotation}
+                    aria-label="Gradient angle"
+                    aria-valuetext={`${design.dotsOptions.gradient.rotation} degrees`}
                     onChange={(e) =>
                       onChange({
                         ...design,
@@ -354,13 +386,21 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
 
       {/* Background Options */}
       <div className="p-3.5 rounded-lg border border-ars-grey-200 bg-ars-white space-y-3">
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink">
+        <p
+          id={`${id}-background`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink"
+        >
           Background Surface
-        </label>
-        <div className="flex flex-wrap items-center gap-4">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-background`}
+          className="flex flex-wrap items-center gap-4"
+        >
           <div className="flex items-center gap-3">
             <input
               type="color"
+              aria-label="Background color"
               disabled={design.backgroundOptions.isTransparent}
               value={design.backgroundOptions.color}
               onChange={(e) =>
@@ -376,6 +416,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
             />
             <input
               type="text"
+              aria-label="Background color hex value"
               disabled={design.backgroundOptions.isTransparent}
               value={design.backgroundOptions.color}
               onChange={(e) =>
@@ -394,7 +435,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              id="bg-transparent"
+              id={`${id}-bg-transparent`}
               checked={design.backgroundOptions.isTransparent}
               onChange={(e) =>
                 onChange({
@@ -407,7 +448,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
               }
               className="rounded border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
             />
-            <label htmlFor="bg-transparent" className="text-xs font-sans text-ars-ink cursor-pointer">
+            <label htmlFor={`${id}-bg-transparent`} className="text-xs font-sans text-ars-ink cursor-pointer">
               Transparent Background (PNG / SVG)
             </label>
           </div>
@@ -417,11 +458,16 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
       {/* Corner Eye Custom Tints */}
       <div className="p-3.5 rounded-lg border border-ars-grey-200 bg-ars-white space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-display font-bold uppercase tracking-wider text-ars-ink">
+          <span
+            id={`${id}-corners`}
+            className="text-xs font-display font-bold uppercase tracking-wider text-ars-ink"
+          >
             Custom Corner Eye Colors
-          </label>
+          </span>
           <button
             type="button"
+            aria-expanded={customCorners}
+            aria-controls={customCorners ? `${id}-corners-panel` : undefined}
             onClick={() => setCustomCorners(!customCorners)}
             className="text-xs font-display font-semibold text-ars-red hover:underline"
           >
@@ -430,7 +476,12 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
         </div>
 
         {customCorners && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-ars-grey-100">
+          <div
+            id={`${id}-corners-panel`}
+            role="group"
+            aria-labelledby={`${id}-corners`}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-ars-grey-100"
+          >
             <div>
               <span className="block text-[11px] font-display font-medium text-ars-grey-600 mb-1.5">
                 Corner Outer Frame Color
@@ -438,6 +489,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
               <div className="flex items-center gap-2">
                 <input
                   type="color"
+                  aria-label="Corner outer frame color"
                   value={design.cornersSquareOptions.color}
                   onChange={(e) =>
                     onChange({
@@ -452,6 +504,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                 />
                 <input
                   type="text"
+                  aria-label="Corner outer frame color hex value"
                   value={design.cornersSquareOptions.color}
                   onChange={(e) =>
                     onChange({
@@ -474,6 +527,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
               <div className="flex items-center gap-2">
                 <input
                   type="color"
+                  aria-label="Corner inner ball color"
                   value={design.cornersDotOptions.color}
                   onChange={(e) =>
                     onChange({
@@ -488,6 +542,7 @@ export const ColorControls: React.FC<ColorControlsProps> = ({
                 />
                 <input
                   type="text"
+                  aria-label="Corner inner ball color hex value"
                   value={design.cornersDotOptions.color}
                   onChange={(e) =>
                     onChange({

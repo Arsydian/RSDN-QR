@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
           {/* Col 2: Security & Privacy */}
           <div>
             <h4 className="text-xs font-display font-bold uppercase tracking-wider text-ars-grey-400 mb-3 flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-ars-red" />
+              <Shield className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
               Zero-Server Architecture
             </h4>
             <p className="text-xs text-ars-grey-400 leading-relaxed">
@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
           {/* Col 3: Specifications */}
           <div>
             <h4 className="text-xs font-display font-bold uppercase tracking-wider text-ars-grey-400 mb-3 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-ars-success" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-ars-success" aria-hidden="true" />
               Standards &amp; Formats
             </h4>
             <ul className="text-xs text-ars-grey-400 space-y-1 font-mono">
@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-ars-grey-600 gap-4 font-sans">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-ars-grey-400 gap-4 font-sans">
           <p>
             © {new Date().getFullYear()} RSDN-QR Studio. Built by{' '}
             <a href="https://arsydian.com" className="text-ars-grey-300 hover:text-ars-red transition-colors">
@@ -63,8 +63,8 @@ export const Footer: React.FC = () => {
             .
           </p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-ars-grey-400 transition-colors">Static Cloudflare Pages Ready</span>
-            <span className="hover:text-ars-grey-400 transition-colors">Client-Side Engine</span>
+            <span>Static Cloudflare Pages Ready</span>
+            <span>Client-Side Engine</span>
           </div>
         </div>
       </div>

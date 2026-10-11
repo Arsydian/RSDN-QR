@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { QrCode, Layers, ShieldCheck } from 'lucide-react';
-import { ARSYDIAN_MARK_INVERTED_DATA_URI } from '../../utils/arsydianBrandAssets';
+import arsydianMarkInverted from '../../assets/brand/arsydian-mark-inverted-header.png';
 
 interface HeaderProps {
   activeMode: 'single' | 'batch';
@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
             className="w-9 h-9 rounded-lg bg-ars-black flex items-center justify-center shadow-ars-sm border border-ars-ink p-1 transition-opacity hover:opacity-80"
           >
             <img
-              src={ARSYDIAN_MARK_INVERTED_DATA_URI}
+              src={arsydianMarkInverted}
               alt="Arsydian"
               className="w-full h-full object-contain"
             />
@@ -48,8 +48,10 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
 
         {/* Mode Selector / Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="bg-ars-grey-50 p-1 rounded-lg border border-ars-grey-200 flex items-center">
+          <div className="bg-ars-grey-50 p-1 rounded-lg border border-ars-grey-200 flex items-center" role="group" aria-label="Mode">
             <button
+              type="button"
+              aria-pressed={activeMode === 'single'}
               onClick={() => onModeChange('single')}
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
                 activeMode === 'single'
@@ -57,10 +59,12 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
                   : 'text-ars-grey-600 hover:text-ars-black'
               }`}
             >
-              <QrCode className="w-3.5 h-3.5 text-ars-red" />
+              <QrCode className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
               <span>Studio</span>
             </button>
             <button
+              type="button"
+              aria-pressed={activeMode === 'batch'}
               onClick={() => onModeChange('batch')}
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold font-display transition-all ${
                 activeMode === 'batch'
@@ -68,13 +72,13 @@ export const Header: React.FC<HeaderProps> = ({ activeMode, onModeChange }) => {
                   : 'text-ars-grey-600 hover:text-ars-black'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-ars-red" />
+              <Layers className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
               <span>CSV Batch</span>
             </button>
           </div>
 
           <div className="hidden lg:flex items-center gap-1.5 text-xs text-ars-grey-600 border-l border-ars-grey-200 pl-4">
-            <ShieldCheck className="w-4 h-4 text-ars-success" />
+            <ShieldCheck className="w-4 h-4 text-ars-success" aria-hidden="true" />
             <span>100% Client-Side Privacy</span>
           </div>
         </div>

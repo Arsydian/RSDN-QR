@@ -8,8 +8,6 @@ import { buildQrOptions, PREVIEW_SIZE } from '../utils/qrRenderer';
 import { QrDesignConfig } from '../types/qr';
 
 const design: QrDesignConfig = {
-  width: 360,
-  height: 360,
   margin: 12,
   errorCorrectionLevel: 'M',
   dotsOptions: { type: 'rounded', color: '#0C0A0B', useGradient: false },

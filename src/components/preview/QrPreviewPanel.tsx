@@ -30,7 +30,7 @@ export const QrPreviewPanel: React.FC<QrPreviewPanelProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [renderFailed, setRenderFailed] = useState(false);
   const [isCardVisible, setIsCardVisible] = useState(true);
@@ -73,10 +73,8 @@ export const QrPreviewPanel: React.FC<QrPreviewPanelProps> = ({
   const handleCopy = async () => {
     if (!isReady) return;
     const success = await copyQrToClipboard(payloadString, design);
-    if (success) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    setCopyState(success ? 'copied' : 'failed');
+    setTimeout(() => setCopyState('idle'), success ? 2000 : 4000);
   };
 
   // Quick 1-click Download (PNG 1024px)
@@ -158,24 +156,38 @@ export const QrPreviewPanel: React.FC<QrPreviewPanelProps> = ({
         {/* Action Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
           <button type="button" onClick={handleCopy} disabled={!isReady} className={secondaryButtonClass}>
-            {copied ? (
+            {copyState === 'copied' ? (
               <>
-                <Check className="w-4 h-4 text-ars-success" />
+                <Check className="w-4 h-4 text-ars-success" aria-hidden="true" />
                 <span>Copied Image!</span>
+              </>
+            ) : copyState === 'failed' ? (
+              <>
+                <AlertTriangle className="w-4 h-4 text-ars-red" aria-hidden="true" />
+                <span>Copy failed, use Download</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 text-ars-grey-600" />
+                <Copy className="w-4 h-4 text-ars-grey-600" aria-hidden="true" />
                 <span>Copy to Clipboard</span>
               </>
             )}
           </button>
 
           <button type="button" onClick={handleQuickDownload} disabled={!isReady} className={secondaryButtonClass}>
-            <Download className="w-4 h-4 text-ars-grey-600" />
+            <Download className="w-4 h-4 text-ars-grey-600" aria-hidden="true" />
             <span>Quick PNG (1024px)</span>
           </button>
         </div>
+
+        {/* Screen reader announcement for copy results */}
+        <p className="sr-only" aria-live="polite">
+          {copyState === 'copied'
+            ? 'QR code image copied to the clipboard.'
+            : copyState === 'failed'
+              ? "Couldn't copy the image in this browser. Use Quick PNG to download it instead."
+              : ''}
+        </p>
 
         {/* Primary High-Resolution Export Button */}
         <button
@@ -184,7 +196,7 @@ export const QrPreviewPanel: React.FC<QrPreviewPanelProps> = ({
           disabled={!isReady}
           className="w-full py-3 px-4 rounded-lg bg-ars-black text-white hover:bg-ars-ink text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-ars-sm border border-ars-black hover:border-ars-red group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-ars-black"
         >
-          <Sparkles className="w-4 h-4 text-ars-red group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-4 h-4 text-ars-red group-hover:rotate-12 transition-transform" aria-hidden="true" />
           <span>High-Resolution &amp; Vector Export (SVG / 4K)</span>
         </button>
       </div>

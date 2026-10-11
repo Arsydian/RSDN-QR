@@ -24,14 +24,43 @@ import {
 // ---------------------------------------------------------------------------
 
 /**
- * Escapes reserved characters in Wi-Fi and vCard strings (; , : \ ").
+ * Escapes reserved characters in Wi-Fi QR fields (; , : \ ").
  * @param str The raw input string.
- * @returns The escaped string safe for protocol encoding.
+ * @returns The escaped string safe for the WIFI: format.
  */
-function escapeSpecialChars(str: string): string {
+function escapeWifi(str: string): string {
   if (!str) return '';
   return str.replace(/([\\;:,"])/g, '\\$1');
 }
+
+/**
+ * Escapes vCard 3.0 / iCalendar TEXT values: backslash, semicolon, comma and line breaks
+ * (RFC 2426 §4, RFC 5545 §3.3.11). Colons and quotes must NOT be escaped in these formats.
+ * @param str The raw input string.
+ * @returns The escaped string.
+ */
+function escapeText(str: string): string {
+  if (!str) return '';
+  return str.replace(/([\\;,])/g, '\\$1').replace(/\r\n|\r|\n/g, '\\n');
+}
+
+/**
+ * Converts a decimal amount (e.g. "1.5") into an integer count of base units (e.g. wei).
+ * @param amount Decimal amount in the coin's normal units.
+ * @param decimals Number of decimal places the token uses (18 for ETH, 6 for USDT).
+ * @returns Integer string, or '' if the amount is not a positive number with at most `decimals` decimals.
+ */
+function toBaseUnits(amount: string, decimals: number): string {
+  const match = /^(\d*)(?:\.(\d*))?$/.exec(amount.trim());
+  if (!match || (!match[1] && !match[2])) return '';
+  const [, whole = '', fraction = ''] = match;
+  if (fraction.length > decimals) return '';
+  const units = BigInt((whole || '0') + fraction.padEnd(decimals, '0'));
+  return units > 0n ? units.toString() : '';
+}
+
+/** Tether (USDT) ERC-20 token contract on Ethereum mainnet. */
+const USDT_CONTRACT = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
 
 /**
  * Converts an ISO-like datetime string (YYYY-MM-DDTHH:mm) into iCalendar UTC/Local format (YYYYMMDDTHHMMSSZ).
@@ -92,12 +121,13 @@ export function formatEmail(payload: EmailPayload): string {
   const email = payload.email.trim();
   if (!email) return '';
 
-  const params = new URLSearchParams();
-  if (payload.subject.trim()) params.append('subject', payload.subject.trim());
-  if (payload.body.trim()) params.append('body', payload.body.trim());
+  // RFC 6068: percent-encode (spaces as %20, not "+") and send line breaks as CRLF
+  const encode = (value: string) => encodeURIComponent(value.replace(/\r?\n/g, '\r\n'));
+  const params: string[] = [];
+  if (payload.subject.trim()) params.push(`subject=${encode(payload.subject.trim())}`);
+  if (payload.body.trim()) params.push(`body=${encode(payload.body.trim())}`);
 
-  const queryString = params.toString();
-  return queryString ? `mailto:${email}?${queryString}` : `mailto:${email}`;
+  return params.length > 0 ? `mailto:${email}?${params.join('&')}` : `mailto:${email}`;
 }
 
 /**
@@ -129,8 +159,8 @@ export function formatSms(payload: SmsPayload): string {
  */
 export function formatWifi(payload: WifiPayload): string {
   if (!payload.ssid.trim()) return '';
-  const ssid = escapeSpecialChars(payload.ssid);
-  const password = payload.encryption === 'nopass' ? '' : escapeSpecialChars(payload.password);
+  const ssid = escapeWifi(payload.ssid);
+  const password = payload.encryption === 'nopass' ? '' : escapeWifi(payload.password);
   const enc = payload.encryption || 'WPA';
   const hidden = payload.hidden ? 'true' : 'false';
 
@@ -148,12 +178,12 @@ export function formatVCard(payload: VCardPayload): string {
   const lines: string[] = [
     'BEGIN:VCARD',
     'VERSION:3.0',
-    `N:${escapeSpecialChars(payload.lastName)};${escapeSpecialChars(payload.firstName)};;;`,
-    `FN:${[payload.firstName, payload.lastName].filter(Boolean).join(' ')}`,
+    `N:${escapeText(payload.lastName)};${escapeText(payload.firstName)};;;`,
+    `FN:${escapeText([payload.firstName, payload.lastName].filter(Boolean).join(' '))}`,
   ];
 
-  if (payload.organization.trim()) lines.push(`ORG:${escapeSpecialChars(payload.organization.trim())}`);
-  if (payload.title.trim()) lines.push(`TITLE:${escapeSpecialChars(payload.title.trim())}`);
+  if (payload.organization.trim()) lines.push(`ORG:${escapeText(payload.organization.trim())}`);
+  if (payload.title.trim()) lines.push(`TITLE:${escapeText(payload.title.trim())}`);
   if (payload.phoneMobile.trim()) lines.push(`TEL;TYPE=CELL,VOICE:${payload.phoneMobile.trim()}`);
   if (payload.phoneWork.trim()) lines.push(`TEL;TYPE=WORK,VOICE:${payload.phoneWork.trim()}`);
   if (payload.email.trim()) lines.push(`EMAIL;TYPE=PREF,INTERNET:${payload.email.trim()}`);
@@ -161,15 +191,15 @@ export function formatVCard(payload: VCardPayload): string {
 
   const hasAddress = payload.street || payload.city || payload.state || payload.zip || payload.country;
   if (hasAddress) {
-    const street = escapeSpecialChars(payload.street);
-    const city = escapeSpecialChars(payload.city);
-    const state = escapeSpecialChars(payload.state);
-    const zip = escapeSpecialChars(payload.zip);
-    const country = escapeSpecialChars(payload.country);
+    const street = escapeText(payload.street);
+    const city = escapeText(payload.city);
+    const state = escapeText(payload.state);
+    const zip = escapeText(payload.zip);
+    const country = escapeText(payload.country);
     lines.push(`ADR;TYPE=WORK:;;${street};${city};${state};${zip};${country}`);
   }
 
-  if (payload.note.trim()) lines.push(`NOTE:${escapeSpecialChars(payload.note.trim())}`);
+  if (payload.note.trim()) lines.push(`NOTE:${escapeText(payload.note.trim())}`);
   lines.push('END:VCARD');
 
   return lines.join('\n');
@@ -207,14 +237,19 @@ export function formatCrypto(payload: CryptoPayload): string {
   switch (payload.currency) {
     case 'bitcoin':
       return `bitcoin:${addr}${queryString}`;
-    case 'ethereum':
-      return payload.amount.trim()
-        ? `ethereum:${addr}?value=${encodeURIComponent(payload.amount.trim())}`
-        : `ethereum:${addr}`;
+    case 'ethereum': {
+      // EIP-681: `value` is an integer amount in wei
+      const wei = toBaseUnits(payload.amount, 18);
+      return wei ? `ethereum:${addr}?value=${wei}` : `ethereum:${addr}`;
+    }
     case 'solana':
       return `solana:${addr}${queryString}`;
-    case 'usdt':
-      return `ethereum:${addr}?token=USDT${queryString ? '&' + queryString.slice(1) : ''}`;
+    case 'usdt': {
+      // EIP-681 ERC-20 transfer: call transfer(address, uint256) on the USDT contract (6 decimals)
+      const units = toBaseUnits(payload.amount, 6);
+      const amountParam = units ? `&uint256=${units}` : '';
+      return `ethereum:${USDT_CONTRACT}/transfer?address=${addr}${amountParam}`;
+    }
     default:
       return addr;
   }
@@ -232,13 +267,13 @@ export function formatEvent(payload: EventPayload): string {
 
   const lines: string[] = [
     'BEGIN:VEVENT',
-    `SUMMARY:${escapeSpecialChars(payload.title)}`,
+    `SUMMARY:${escapeText(payload.title)}`,
   ];
 
   if (start) lines.push(`DTSTART:${start}`);
   if (end) lines.push(`DTEND:${end}`);
-  if (payload.location.trim()) lines.push(`LOCATION:${escapeSpecialChars(payload.location.trim())}`);
-  if (payload.description.trim()) lines.push(`DESCRIPTION:${escapeSpecialChars(payload.description.trim())}`);
+  if (payload.location.trim()) lines.push(`LOCATION:${escapeText(payload.location.trim())}`);
+  if (payload.description.trim()) lines.push(`DESCRIPTION:${escapeText(payload.description.trim())}`);
 
   lines.push('END:VEVENT');
   return lines.join('\n');

@@ -4,7 +4,7 @@
  * safe scaling constraints to preserve scannability, padding margins, and background clearance.
  */
 
-import React, { useRef } from 'react';
+import React, { useId, useRef } from 'react';
 import { Upload, Trash2, Sparkles } from 'lucide-react';
 import { QrDesignConfig } from '../../types/qr';
 import { BUILT_IN_ICONS } from '../../utils/builtInIcons';
@@ -18,6 +18,7 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
   design,
   onChange,
 }) => {
+  const id = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Process user uploaded image file
@@ -44,14 +45,14 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
   };
 
   // Select built-in icon
-  const handleSelectPreset = (svgDataUri: string, name: string) => {
+  const handleSelectPreset = (iconSrc: string, name: string) => {
     onChange({
       ...design,
       errorCorrectionLevel:
         design.errorCorrectionLevel === 'L' ? 'H' : design.errorCorrectionLevel,
       imageOptions: {
         ...design.imageOptions,
-        src: svgDataUri,
+        src: iconSrc,
         name,
       },
     });
@@ -74,9 +75,9 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
     <div className="space-y-6">
       {/* Upload or Active Logo Banner */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
+        <p className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
           Custom Logo or Icon
-        </label>
+        </p>
 
         {design.imageOptions.src ? (
           <div className="p-3.5 rounded-lg border border-ars-grey-200 bg-ars-white flex items-center justify-between shadow-ars-xs">
@@ -98,54 +99,74 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
               </div>
             </div>
 
+            {/* Icon-only button: grey-600 keeps the icon above 3:1 non-text contrast */}
             <button
               type="button"
               onClick={handleRemoveLogo}
-              className="p-2 text-ars-grey-400 hover:text-ars-red rounded-lg hover:bg-ars-red-50 transition-colors"
+              aria-label="Remove logo"
+              className="p-2 text-ars-grey-600 hover:text-ars-red rounded-lg hover:bg-ars-red-50 transition-colors"
               title="Remove Logo"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         ) : (
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-ars-grey-200 hover:border-ars-red bg-ars-white hover:bg-ars-grey-50 rounded-lg p-5 text-center cursor-pointer transition-all group"
-          >
+          <>
+            {/* Hidden native input; the button below is the keyboard-reachable trigger */}
             <input
               ref={fileInputRef}
               type="file"
               accept="image/png, image/jpeg, image/svg+xml, image/webp"
               onChange={handleFileUpload}
               className="hidden"
+              aria-hidden="true"
+              tabIndex={-1}
             />
-            <div className="w-10 h-10 rounded-full bg-ars-grey-50 group-hover:bg-ars-red-50 text-ars-grey-600 group-hover:text-ars-red flex items-center justify-center mx-auto mb-2 transition-colors">
-              <Upload className="w-5 h-5" />
-            </div>
-            <p className="font-display font-semibold text-xs text-ars-ink">
-              Click to upload your logo
-            </p>
-            <p className="text-[11px] text-ars-grey-400 mt-0.5">
-              PNG, SVG, JPG or WebP (Transparent PNG / SVG recommended)
-            </p>
-          </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              aria-describedby={`${id}-upload-hint`}
+              className="block w-full border-2 border-dashed border-ars-grey-200 hover:border-ars-red bg-ars-white hover:bg-ars-grey-50 rounded-lg p-5 text-center cursor-pointer transition-all group"
+            >
+              <span
+                className="w-10 h-10 rounded-full bg-ars-grey-50 group-hover:bg-ars-red-50 text-ars-grey-600 group-hover:text-ars-red flex items-center justify-center mx-auto mb-2 transition-colors"
+                aria-hidden="true"
+              >
+                <Upload className="w-5 h-5" />
+              </span>
+              <span className="block font-display font-semibold text-xs text-ars-ink">
+                Click to upload your logo
+              </span>
+              <span id={`${id}-upload-hint`} className="block text-[11px] text-ars-grey-600 mt-0.5">
+                PNG, SVG, JPG or WebP (Transparent PNG / SVG recommended)
+              </span>
+            </button>
+          </>
         )}
       </div>
 
       {/* Built-in Preset Icons Grid */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-ars-red" />
+        <p
+          id={`${id}-built-in`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2 flex items-center gap-1.5"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
           Or Choose from Built-in Icons
-        </label>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-built-in`}
+          className="grid grid-cols-4 sm:grid-cols-7 gap-2"
+        >
           {BUILT_IN_ICONS.map((icon) => {
-            const isSelected = design.imageOptions.src === icon.svgDataUri;
+            const isSelected = design.imageOptions.src === icon.src;
             return (
               <button
                 key={icon.id}
                 type="button"
-                onClick={() => handleSelectPreset(icon.svgDataUri, icon.name)}
+                aria-pressed={isSelected}
+                onClick={() => handleSelectPreset(icon.src, icon.name)}
                 className={`p-2 rounded-lg border flex flex-col items-center justify-center transition-all ${
                   isSelected
                     ? 'bg-ars-black text-white border-ars-black shadow-ars-xs'
@@ -154,7 +175,8 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
                 title={icon.name}
               >
                 <div className="w-7 h-7 mb-1 flex items-center justify-center">
-                  <img src={icon.svgDataUri} alt={icon.name} className="w-full h-full object-contain" />
+                  {/* Empty alt: the visible name below already labels the button */}
+                  <img src={icon.src} alt="" className="w-full h-full object-contain" />
                 </div>
                 <span className="text-[9px] font-display font-medium truncate w-full text-center">
                   {icon.name}
@@ -170,19 +192,24 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
         <div className="p-3.5 rounded-lg border border-ars-grey-200 bg-ars-white space-y-4">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-display font-bold uppercase tracking-wider text-ars-ink">
+              <label
+                htmlFor={`${id}-size`}
+                className="font-display font-bold uppercase tracking-wider text-ars-ink"
+              >
                 Logo Scale / Area
-              </span>
+              </label>
               <span className="font-mono text-ars-grey-600">
                 {Math.round(design.imageOptions.size * 100)}% (Max 35% safe limit)
               </span>
             </div>
             <input
+              id={`${id}-size`}
               type="range"
               min="0.10"
               max="0.35"
               step="0.01"
               value={design.imageOptions.size}
+              aria-valuetext={`${Math.round(design.imageOptions.size * 100)}%`}
               onChange={(e) =>
                 onChange({
                   ...design,
@@ -198,19 +225,24 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-display font-bold uppercase tracking-wider text-ars-ink">
+              <label
+                htmlFor={`${id}-margin`}
+                className="font-display font-bold uppercase tracking-wider text-ars-ink"
+              >
                 Logo Outer Padding Margin
-              </span>
+              </label>
               <span className="font-mono text-ars-grey-600">
                 {design.imageOptions.margin}px
               </span>
             </div>
             <input
+              id={`${id}-margin`}
               type="range"
               min="0"
               max="20"
               step="1"
               value={design.imageOptions.margin}
+              aria-valuetext={`${design.imageOptions.margin} pixels`}
               onChange={(e) =>
                 onChange({
                   ...design,
@@ -227,7 +259,7 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
           <div className="flex items-center gap-2 pt-1 border-t border-ars-grey-100">
             <input
               type="checkbox"
-              id="hide-dots-bg"
+              id={`${id}-hide-dots-bg`}
               checked={design.imageOptions.hideBackgroundDots}
               onChange={(e) =>
                 onChange({
@@ -240,7 +272,7 @@ export const LogoControls: React.FC<LogoControlsProps> = ({
               }
               className="rounded border-ars-grey-300 text-ars-red focus:ring-ars-red w-4 h-4"
             />
-            <label htmlFor="hide-dots-bg" className="text-xs font-sans text-ars-ink cursor-pointer">
+            <label htmlFor={`${id}-hide-dots-bg`} className="text-xs font-sans text-ars-ink cursor-pointer">
               Clear QR dots beneath logo for clean visibility
             </label>
           </div>

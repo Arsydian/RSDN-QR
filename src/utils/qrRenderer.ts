@@ -200,19 +200,18 @@ export async function copyQrToClipboard(
   data: string,
   design: QrDesignConfig
 ): Promise<boolean> {
+  if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') return false;
   try {
-    const exportInstance = createQrInstance(data, design, 1024);
-    const blob = (await exportInstance.getRawData('png')) as Blob | null;
-    if (!blob) return false;
-
-    // ClipboardItem API
-    if (navigator.clipboard && window.ClipboardItem) {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ]);
-      return true;
-    }
-    return false;
+    // Hand the clipboard a Promise so the write starts synchronously inside the click.
+    // Safari rejects clipboard writes that begin after an await.
+    const blob = createQrInstance(data, design, 1024)
+      .getRawData('png')
+      .then((raw) => {
+        if (!raw) throw new Error('Rendering produced no image');
+        return raw as Blob;
+      });
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    return true;
   } catch (error) {
     console.error('Failed to copy QR code to clipboard:', error);
     return false;

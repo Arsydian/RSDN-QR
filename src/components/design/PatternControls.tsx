@@ -4,7 +4,7 @@
  * corner square eye frames, and corner inner eye dots.
  */
 
-import React from 'react';
+import React, { useId } from 'react';
 import { DotType, CornerSquareType, CornerDotType, QrDesignConfig } from '../../types/qr';
 
 interface PatternControlsProps {
@@ -16,6 +16,8 @@ export const PatternControls: React.FC<PatternControlsProps> = ({
   design,
   onChange,
 }) => {
+  const id = useId();
+
   // 1. Body Dot Styles
   const dotStyles: { type: DotType; label: string; desc: string }[] = [
     { type: 'rounded', label: 'Smooth Rounded', desc: 'Soft rounded corners' },
@@ -43,16 +45,24 @@ export const PatternControls: React.FC<PatternControlsProps> = ({
     <div className="space-y-6">
       {/* Body Pattern */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
+        <p
+          id={`${id}-body`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2"
+        >
           Body Module Shape
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-body`}
+          className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+        >
           {dotStyles.map((item) => {
             const isSelected = design.dotsOptions.type === item.type;
             return (
               <button
                 key={item.type}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() =>
                   onChange({
                     ...design,
@@ -80,16 +90,24 @@ export const PatternControls: React.FC<PatternControlsProps> = ({
 
       {/* Corner Eye Outer Frame */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
+        <p
+          id={`${id}-corner-square`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2"
+        >
           Corner Eye Frame (Outer)
-        </label>
-        <div className="grid grid-cols-3 gap-2">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-corner-square`}
+          className="grid grid-cols-3 gap-2"
+        >
           {cornerSquareStyles.map((item) => {
             const isSelected = design.cornersSquareOptions.type === item.type;
             return (
               <button
                 key={item.type}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() =>
                   onChange({
                     ...design,
@@ -114,16 +132,24 @@ export const PatternControls: React.FC<PatternControlsProps> = ({
 
       {/* Corner Eye Inner Ball */}
       <div>
-        <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
+        <p
+          id={`${id}-corner-dot`}
+          className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2"
+        >
           Corner Eye Ball (Inner)
-        </label>
-        <div className="grid grid-cols-2 gap-2">
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${id}-corner-dot`}
+          className="grid grid-cols-2 gap-2"
+        >
           {cornerDotStyles.map((item) => {
             const isSelected = design.cornersDotOptions.type === item.type;
             return (
               <button
                 key={item.type}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() =>
                   onChange({
                     ...design,

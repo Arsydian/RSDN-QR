@@ -5,7 +5,7 @@
  * scannability health analytics, and CSV batch processing.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type KeyboardEvent } from 'react';
 import {
   FileCode,
   Shapes,
@@ -54,7 +54,7 @@ import { BatchTab } from './components/batch/BatchTab';
 // Default initial state
 const INITIAL_PAYLOADS: QrPayloadState = {
   url: { url: 'https://arsydian.com' },
-  text: { text: 'Arsydian IT & Security Services — No jargon, no finger-pointing.' },
+  text: { text: 'Arsydian IT & Security Services — No jargon, no hassles.' },
   email: { email: '', subject: '', body: '' },
   phone: { phone: '' },
   sms: { phone: '', message: '' },
@@ -87,8 +87,6 @@ const INITIAL_PAYLOADS: QrPayloadState = {
 };
 
 const INITIAL_DESIGN: QrDesignConfig = {
-  width: 360,
-  height: 360,
   margin: 12,
   errorCorrectionLevel: 'M',
   dotsOptions: {
@@ -118,7 +116,15 @@ const INITIAL_DESIGN: QrDesignConfig = {
   },
 };
 
-type StudioSubTab = 'content' | 'pattern' | 'colors' | 'logo' | 'security';
+const STUDIO_TABS = [
+  { id: 'content', label: 'Content Data', icon: FileCode },
+  { id: 'pattern', label: 'Shapes & Eyes', icon: Shapes },
+  { id: 'colors', label: 'Colors & Gradients', icon: Palette },
+  { id: 'logo', label: 'Logo Overlay', icon: ImageIcon },
+  { id: 'security', label: 'Error Correction', icon: ShieldCheck },
+] as const;
+
+type StudioSubTab = (typeof STUDIO_TABS)[number]['id'];
 
 export function App() {
   const [activeMode, setActiveMode] = useState<'single' | 'batch'>('single');
@@ -137,6 +143,24 @@ export function App() {
   const scannabilityReport = useMemo(() => {
     return analyzeScannability(activePayloadString, design);
   }, [activePayloadString, design]);
+
+  // Arrow-key navigation between customization tabs (WAI-ARIA tabs pattern)
+  const handleTabKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const focusedId = (e.target as HTMLElement).id;
+    const focusedIndex = STUDIO_TABS.findIndex((tab) => `tab-${tab.id}` === focusedId);
+    const index = focusedIndex >= 0 ? focusedIndex : STUDIO_TABS.findIndex((tab) => tab.id === activeSubTab);
+    const next =
+      e.key === 'ArrowRight' ? (index + 1) % STUDIO_TABS.length
+      : e.key === 'ArrowLeft' ? (index - 1 + STUDIO_TABS.length) % STUDIO_TABS.length
+      : e.key === 'Home' ? 0
+      : e.key === 'End' ? STUDIO_TABS.length - 1
+      : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    const id = STUDIO_TABS[next].id;
+    setActiveSubTab(id);
+    document.getElementById(`tab-${id}`)?.focus();
+  };
 
   // Render form based on selected type
   const renderContentForm = () => {
@@ -208,21 +232,23 @@ export function App() {
               {/* Customization Tabs */}
               <div className="ars-card overflow-hidden">
                 {/* Tab Header Bar */}
-                <div className="flex items-center border-b border-ars-grey-200 bg-ars-grey-50 px-2 pt-2 gap-1 overflow-x-auto">
-                  {(
-                    [
-                      { id: 'content', label: 'Content Data', icon: FileCode },
-                      { id: 'pattern', label: 'Shapes & Eyes', icon: Shapes },
-                      { id: 'colors', label: 'Colors & Gradients', icon: Palette },
-                      { id: 'logo', label: 'Logo Overlay', icon: ImageIcon },
-                      { id: 'security', label: 'Error Correction', icon: ShieldCheck },
-                    ] as const
-                  ).map(({ id, label, icon: Icon }) => {
+                <div
+                  role="tablist"
+                  aria-label="Customization"
+                  onKeyDown={handleTabKeyDown}
+                  className="flex items-center border-b border-ars-grey-200 bg-ars-grey-50 px-2 pt-2 gap-1 overflow-x-auto"
+                >
+                  {STUDIO_TABS.map(({ id, label, icon: Icon }) => {
                     const isActive = activeSubTab === id;
                     return (
                       <button
                         key={id}
+                        id={`tab-${id}`}
                         type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-controls="studio-tabpanel"
+                        tabIndex={isActive ? 0 : -1}
                         onClick={() => setActiveSubTab(id)}
                         className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-t-lg font-display font-bold text-xs transition-all border-t border-x -mb-px whitespace-nowrap ${
                           isActive
@@ -230,10 +256,10 @@ export function App() {
                             : 'border-transparent text-ars-grey-600 hover:text-ars-black hover:bg-ars-grey-100'
                         }`}
                       >
-                        <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-ars-red' : 'text-ars-grey-400'}`} />
+                        <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-ars-red' : 'text-ars-grey-400'}`} aria-hidden="true" />
                         <span>{label}</span>
                         {id === 'logo' && design.imageOptions.src && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-ars-red" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-ars-red" aria-label="(logo added)" />
                         )}
                       </button>
                     );
@@ -241,7 +267,7 @@ export function App() {
                 </div>
 
                 {/* Sub Tab Content Pane */}
-                <div className="p-5">
+                <div className="p-5" role="tabpanel" id="studio-tabpanel" aria-labelledby={`tab-${activeSubTab}`}>
                   {activeSubTab === 'content' && renderContentForm()}
                   {activeSubTab === 'pattern' && (
                     <PatternControls design={design} onChange={setDesign} />

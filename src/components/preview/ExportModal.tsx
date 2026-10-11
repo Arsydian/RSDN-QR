@@ -1,10 +1,12 @@
 /**
  * @file ExportModal.tsx
  * @description Modal dialog for high-resolution vector and raster export (PNG, JPEG, SVG up to 4K).
+ * Accessible dialog: Escape or a backdrop click closes it, focus stays inside while open and
+ * returns to the opening button afterwards.
  */
 
-import React, { useState } from 'react';
-import { X, Download, Sparkles } from 'lucide-react';
+import React, { useEffect, useId, useRef, useState } from 'react';
+import { X, Download, Sparkles, AlertTriangle } from 'lucide-react';
 import { QrDesignConfig, ExportFormat, ExportResolution } from '../../types/qr';
 import { downloadQrCode } from '../../utils/qrRenderer';
 
@@ -27,21 +29,66 @@ const RESOLUTIONS: {
   { value: 4096, label: '4096 × 4096 px', desc: '4K Ultra Print (300+ DPI)', recommendedFor: 'Posters, billboards & large banners' },
 ];
 
+const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+
 export const ExportModal: React.FC<ExportModalProps> = ({
   isOpen,
   onClose,
   payloadString,
   design,
 }) => {
+  const idPrefix = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   const [format, setFormat] = useState<ExportFormat>('png');
   const [resolution, setResolution] = useState<ExportResolution>(2048);
   const [filename, setFilename] = useState('rsdn-custom-qr');
   const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+
+  // Focus management: move focus into the dialog, trap Tab, close on Escape, restore focus on close
+  useEffect(() => {
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusables = () => Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
+    focusables()[0]?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleDownload = async () => {
     try {
+      setExportError('');
       setIsExporting(true);
       await downloadQrCode(
         payloadString,
@@ -56,37 +103,58 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       }, 400);
     } catch (err) {
       console.error('Export failed:', err);
+      setExportError('The export failed. Try a smaller resolution or a different format.');
       setIsExporting(false);
     }
   };
 
+  const optionClass = (selected: boolean) =>
+    `rounded-lg border text-left transition-all ${
+      selected
+        ? 'bg-ars-black text-white border-ars-black shadow-ars-xs'
+        : 'bg-ars-white text-ars-ink border-ars-grey-200 hover:border-ars-red'
+    }`;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ars-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-ars-white rounded-xl border border-ars-grey-200 shadow-ars-lg w-full max-w-lg overflow-hidden">
-        
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ars-black/60 backdrop-blur-sm animate-fade-in"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${idPrefix}-title`}
+        className="bg-ars-white rounded-xl border border-ars-grey-200 shadow-ars-lg w-full max-w-lg max-h-full overflow-y-auto"
+      >
+
         {/* Header */}
         <div className="p-4 border-b border-ars-grey-200 flex items-center justify-between bg-ars-grey-50">
           <div className="flex items-center gap-2">
-            <Download className="w-4 h-4 text-ars-red" />
-            <h3 className="font-display font-bold text-sm text-ars-black uppercase tracking-wider">
+            <Download className="w-4 h-4 text-ars-red" aria-hidden="true" />
+            <h3 id={`${idPrefix}-title`} className="font-display font-bold text-sm text-ars-black uppercase tracking-wider">
               Export High-Resolution QR Code
             </h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-ars-grey-400 hover:text-ars-black rounded-lg hover:bg-ars-grey-200 transition-colors"
+            aria-label="Close export dialog"
+            className="p-1.5 text-ars-grey-600 hover:text-ars-black rounded-lg hover:bg-ars-grey-200 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
 
         <div className="p-5 space-y-5">
           {/* Format Selection */}
           <div>
-            <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
+            <span id={`${idPrefix}-format`} className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2">
               File Format
-            </label>
-            <div className="grid grid-cols-3 gap-2">
+            </span>
+            <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby={`${idPrefix}-format`}>
               {(
                 [
                   { id: 'png', label: 'PNG Image', desc: 'Lossless raster with alpha transparency' },
@@ -98,14 +166,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   key={f.id}
                   type="button"
                   onClick={() => setFormat(f.id)}
-                  className={`p-3 rounded-lg border text-left transition-all ${
-                    format === f.id
-                      ? 'bg-ars-black text-white border-ars-black shadow-ars-xs'
-                      : 'bg-ars-white text-ars-ink border-ars-grey-200 hover:border-ars-red'
-                  }`}
+                  aria-pressed={format === f.id}
+                  className={`p-3 ${optionClass(format === f.id)}`}
                 >
                   <div className="font-display font-bold text-xs">{f.label}</div>
-                  <div className={`text-[10px] mt-0.5 leading-tight ${format === f.id ? 'text-ars-grey-400' : 'text-ars-grey-600'}`}>
+                  <div className={`text-[10px] mt-0.5 leading-tight ${format === f.id ? 'text-ars-grey-300' : 'text-ars-grey-600'}`}>
                     {f.desc}
                   </div>
                 </button>
@@ -123,21 +188,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           {/* Resolution Selection (Only applies to raster PNG/JPEG) */}
           {format !== 'svg' ? (
             <div>
-              <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-2 flex items-center justify-between">
-                <span>Output Resolution</span>
+              <div className="flex items-center justify-between mb-2">
+                <span id={`${idPrefix}-resolution`} className="text-xs font-display font-bold uppercase tracking-wider text-ars-ink">
+                  Output Resolution
+                </span>
                 <span className="text-[11px] font-mono text-ars-grey-600">Print Quality</span>
-              </label>
-              <div className="grid grid-cols-2 gap-2">
+              </div>
+              <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby={`${idPrefix}-resolution`}>
                 {RESOLUTIONS.map((res) => (
                   <button
                     key={res.value}
                     type="button"
                     onClick={() => setResolution(res.value)}
-                    className={`p-2.5 rounded-lg border text-left transition-all ${
-                      resolution === res.value
-                        ? 'bg-ars-black text-white border-ars-black shadow-ars-xs'
-                        : 'bg-ars-white text-ars-ink border-ars-grey-200 hover:border-ars-red'
-                    }`}
+                    aria-pressed={resolution === res.value}
+                    className={`p-2.5 ${optionClass(resolution === res.value)}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-display font-bold text-xs font-mono">{res.label}</span>
@@ -145,7 +209,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                         <span className="ars-badge bg-ars-red text-white text-[9px] py-0">Recommended</span>
                       )}
                     </div>
-                    <div className={`text-[10px] mt-0.5 ${resolution === res.value ? 'text-ars-grey-400' : 'text-ars-grey-600'}`}>
+                    <div className={`text-[10px] mt-0.5 ${resolution === res.value ? 'text-ars-grey-300' : 'text-ars-grey-600'}`}>
                       {res.recommendedFor}
                     </div>
                   </button>
@@ -154,7 +218,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </div>
           ) : (
             <div className="bg-ars-grey-50 border border-ars-grey-200 rounded-lg p-3 text-xs text-ars-grey-600 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-ars-red shrink-0" />
+              <Sparkles className="w-4 h-4 text-ars-red shrink-0" aria-hidden="true" />
               <span>
                 SVG is a resolution-independent vector format. It scales to any size without losing crispness.
               </span>
@@ -163,22 +227,30 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
           {/* Filename */}
           <div>
-            <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-1.5">
+            <label htmlFor={`${idPrefix}-filename`} className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-1.5">
               File Name
             </label>
             <div className="flex items-center rounded-lg border border-ars-grey-200 overflow-hidden bg-ars-white">
               <input
+                id={`${idPrefix}-filename`}
                 type="text"
                 value={filename}
                 onChange={(e) => setFilename(e.target.value)}
                 placeholder="my-custom-qr-code"
-                className="w-full px-3 py-2 text-sm text-ars-ink border-none focus:ring-0 font-sans"
+                className="w-full px-3 py-2 text-sm text-ars-ink border-none focus:ring-0 font-sans placeholder:text-[#737277]"
               />
-              <span className="px-3 text-xs font-mono font-bold text-ars-grey-600 bg-ars-grey-100 border-l border-ars-grey-200">
+              <span className="px-3 text-xs font-mono font-bold text-ars-grey-600 bg-ars-grey-100 border-l border-ars-grey-200" aria-hidden="true">
                 .{format}
               </span>
             </div>
           </div>
+
+          {exportError && (
+            <p className="flex items-start gap-2 text-xs text-ars-ink bg-ars-red-50 border border-ars-red-100 rounded-lg p-3" role="alert">
+              <AlertTriangle className="w-4 h-4 text-ars-red shrink-0" aria-hidden="true" />
+              {exportError}
+            </p>
+          )}
         </div>
 
         {/* Footer Actions */}
@@ -196,7 +268,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             disabled={isExporting}
             className="px-5 py-2 rounded-lg text-xs font-display font-bold text-white bg-ars-red hover:bg-ars-red-600 transition-all flex items-center gap-2 shadow-ars-sm disabled:opacity-50"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5" aria-hidden="true" />
             {isExporting ? 'Generating...' : `Download .${format.toUpperCase()}`}
           </button>
         </div>

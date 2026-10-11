@@ -11,4 +11,8 @@ export default defineConfig({
     setupFiles: './src/tests/setup.ts',
   },
   base: './', // Relative base for static deployment flexibility (e.g. Cloudflare Pages)
+  build: {
+    // Keep fonts as separate files: the CSP in public/_headers only allows same-origin fonts
+    assetsInlineLimit: (filePath) => (/\.woff2?$/.test(filePath) ? false : undefined),
+  },
 });

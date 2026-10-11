@@ -3,7 +3,7 @@
  * @description Controls for choosing Error Correction Level (L: 7%, M: 15%, Q: 25%, H: 30%).
  */
 
-import React from 'react';
+import React, { useId } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { ErrorCorrectionLevel, QrDesignConfig } from '../../types/qr';
 
@@ -28,23 +28,30 @@ export const ErrorCorrectionControls: React.FC<ErrorCorrectionControlsProps> = (
   design,
   onChange,
 }) => {
+  const id = useId();
+
   return (
     <div className="space-y-3">
-      <label className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-1 flex items-center justify-between">
-        <span className="flex items-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-ars-red" />
+      <div className="block text-xs font-display font-bold uppercase tracking-wider text-ars-ink mb-1 flex items-center justify-between">
+        <span id={`${id}-heading`} className="flex items-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-ars-red" aria-hidden="true" />
           Error Correction Level
         </span>
         <span className="text-[11px] font-mono text-ars-grey-600">Reed-Solomon Algorithm</span>
-      </label>
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div
+        role="group"
+        aria-labelledby={`${id}-heading`}
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+      >
         {EC_LEVELS.map((item) => {
           const isSelected = design.errorCorrectionLevel === item.level;
           return (
             <button
               key={item.level}
               type="button"
+              aria-pressed={isSelected}
               onClick={() => onChange({ ...design, errorCorrectionLevel: item.level })}
               className={`p-2.5 rounded-lg border text-left transition-all ${
                 isSelected

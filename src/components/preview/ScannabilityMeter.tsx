@@ -25,25 +25,25 @@ export const ScannabilityMeter: React.FC<ScannabilityMeterProps> = ({ report }) 
       case 'excellent':
         return (
           <span className="ars-badge bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3" /> Excellent Scannability
+            <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> Excellent Scannability
           </span>
         );
       case 'good':
         return (
           <span className="ars-badge bg-blue-50 text-blue-700 border border-blue-200">
-            <ShieldCheck className="w-3 h-3" /> Good Readability
+            <ShieldCheck className="w-3 h-3" aria-hidden="true" /> Good Readability
           </span>
         );
       case 'warning':
         return (
           <span className="ars-badge bg-amber-50 text-amber-700 border border-amber-200">
-            <AlertTriangle className="w-3 h-3" /> Potential Scan Issues
+            <AlertTriangle className="w-3 h-3" aria-hidden="true" /> Potential Scan Issues
           </span>
         );
       case 'critical':
         return (
           <span className="ars-badge bg-red-50 text-red-700 border border-red-200">
-            <ShieldAlert className="w-3 h-3" /> Critical: Unreadable
+            <ShieldAlert className="w-3 h-3" aria-hidden="true" /> Critical: Unreadable
           </span>
         );
     }
@@ -61,16 +61,24 @@ export const ScannabilityMeter: React.FC<ScannabilityMeterProps> = ({ report }) 
       {/* Header & Score */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ScanLine className="w-4 h-4 text-ars-red" />
+          <ScanLine className="w-4 h-4 text-ars-red" aria-hidden="true" />
           <span className="font-display font-bold text-xs uppercase tracking-wider text-ars-ink">
             Camera Scannability Health
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {getRatingBadge(report.rating)}
-          <span className="font-mono font-bold text-sm text-ars-ink">
-            {report.score}%
-          </span>
+          {report.payloadBytes === 0 ? (
+            <span className="ars-badge bg-ars-grey-50 text-ars-grey-600 border border-ars-grey-200">
+              Waiting for content
+            </span>
+          ) : (
+            <>
+              {getRatingBadge(report.rating)}
+              <span className="font-mono font-bold text-sm text-ars-ink">
+                {report.score}%
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -98,13 +106,13 @@ export const ScannabilityMeter: React.FC<ScannabilityMeterProps> = ({ report }) 
 
         <div className="bg-ars-grey-50 p-2 rounded-md border border-ars-grey-200">
           <div className="text-[10px] font-display font-semibold text-ars-grey-600 uppercase">
-            Logo Area
+            Logo Cover
           </div>
           <div className="font-mono font-bold text-xs text-ars-ink mt-0.5">
             {report.logoOcclusionPercent > 0 ? `~${report.logoOcclusionPercent}%` : 'None'}
           </div>
           <div className="text-[9px] text-ars-grey-600">
-            {report.logoSafe ? 'Safe Overlay' : 'Exceeds EC'}
+            {report.logoSafe ? 'Safe Overlay' : 'Raise EC Level'}
           </div>
         </div>
 
@@ -113,7 +121,7 @@ export const ScannabilityMeter: React.FC<ScannabilityMeterProps> = ({ report }) 
             Payload Size
           </div>
           <div className="font-mono font-bold text-xs text-ars-ink mt-0.5">
-            {report.characterCount} <span className="font-sans font-normal text-[10px]">chars</span>
+            {report.payloadBytes.toLocaleString()} <span className="font-sans font-normal text-[10px]">bytes</span>
           </div>
           <div className="text-[9px] text-ars-grey-600">
             {report.dataDensitySafe ? 'Optimal Density' : 'High Density'}
@@ -135,7 +143,7 @@ export const ScannabilityMeter: React.FC<ScannabilityMeterProps> = ({ report }) 
                   : 'bg-ars-grey-50 text-ars-grey-600 border border-ars-grey-200'
               }`}
             >
-              <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-current" />
+              <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-current" aria-hidden="true" />
               <span className="leading-snug">{rec}</span>
             </div>
           ))}

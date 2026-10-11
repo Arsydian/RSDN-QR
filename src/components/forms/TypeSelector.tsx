@@ -47,13 +47,14 @@ export const TypeSelector: React.FC<TypeSelectorProps> = ({
   onSelectType,
 }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+    <div role="group" aria-label="QR code type" className="grid grid-cols-2 sm:grid-cols-5 gap-2">
       {QR_TYPES.map(({ type, label, icon: Icon }) => {
         const isActive = activeType === type;
         return (
           <button
             key={type}
             type="button"
+            aria-pressed={isActive}
             onClick={() => onSelectType(type)}
             className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all ${
               isActive
@@ -62,7 +63,7 @@ export const TypeSelector: React.FC<TypeSelectorProps> = ({
             }`}
           >
             <div className={`p-1.5 rounded-md mb-1.5 ${isActive ? 'bg-ars-red text-white' : 'text-ars-grey-600'}`}>
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4 h-4" aria-hidden="true" />
             </div>
             <span className="font-display font-semibold text-xs tracking-tight">{label}</span>
           </button>

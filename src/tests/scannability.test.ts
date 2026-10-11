@@ -8,8 +8,6 @@ import { calculateContrastRatio, analyzeScannability } from '../utils/scannabili
 import { QrDesignConfig } from '../types/qr';
 
 const defaultDesign: QrDesignConfig = {
-  width: 360,
-  height: 360,
   margin: 10,
   errorCorrectionLevel: 'M',
   dotsOptions: {
@@ -73,19 +71,67 @@ describe('Scannability Analyzer', () => {
     expect(result.recommendations.length).toBeGreaterThan(0);
   });
 
-  it('detects when logo size exceeds error correction capacity', () => {
-    const bigLogoDesign: QrDesignConfig = {
+  it('reports logo cover the way qr-code-styling sizes logos (size × EC capacity)', () => {
+    const logoDesign = (errorCorrectionLevel: QrDesignConfig['errorCorrectionLevel']): QrDesignConfig => ({
       ...defaultDesign,
-      errorCorrectionLevel: 'L', // 7% capacity
-      imageOptions: {
-        ...defaultDesign.imageOptions,
-        src: 'data:image/svg+xml;base64,...',
-        size: 0.35, // 0.35^2 = 12.25% area, which exceeds 7%
+      errorCorrectionLevel,
+      imageOptions: { ...defaultDesign.imageOptions, src: 'data:image/svg+xml;base64,...', size: 0.35 },
+    });
+
+    const atH = analyzeScannability('https://arsydian.com', logoDesign('H'));
+    expect(atH.logoOcclusionPercent).toBe(10.5); // 0.35 × 30%
+    expect(atH.logoSafe).toBe(true);
+    expect(atH.rating).toBe('excellent');
+
+    const atL = analyzeScannability('https://arsydian.com', logoDesign('L'));
+    expect(atL.logoOcclusionPercent).toBe(2.5); // 0.35 × 7%, rounded
+    expect(atL.logoSafe).toBe(false);
+    expect(atL.recommendations.some(r => r.includes('Medium (M) or higher'))).toBe(true);
+  });
+
+  it('uses the weakest color, including gradient stops and corners', () => {
+    const gradientDesign: QrDesignConfig = {
+      ...defaultDesign,
+      dotsOptions: {
+        ...defaultDesign.dotsOptions,
+        useGradient: true,
+        gradient: { type: 'linear', rotation: 0, colorStops: [{ offset: 0, color: '#000000' }, { offset: 1, color: '#DDDDDD' }] },
       },
     };
+    expect(analyzeScannability('x', gradientDesign).contrastPass).toBe(false);
 
-    const result = analyzeScannability('https://arsydian.com', bigLogoDesign);
-    expect(result.logoSafe).toBe(false);
-    expect(result.recommendations.some(r => r.includes('High'))).toBe(true);
+    const paleCorners: QrDesignConfig = {
+      ...defaultDesign,
+      cornersSquareOptions: { ...defaultDesign.cornersSquareOptions, color: '#F5C6C7' },
+    };
+    const result = analyzeScannability('x', paleCorners);
+    expect(result.contrastPass).toBe(false);
+    expect(result.recommendations[0]).toContain('Corner frame');
+  });
+
+  it('parses named and rgb() colors instead of treating them as black', () => {
+    expect(calculateContrastRatio('white', '#FFFFFF')).toBe(1);
+    expect(calculateContrastRatio('rgb(0, 0, 0)', 'white')).toBe(21);
+  });
+
+  it('warns about inverted (light-on-dark) codes', () => {
+    const inverted: QrDesignConfig = {
+      ...defaultDesign,
+      dotsOptions: { ...defaultDesign.dotsOptions, color: '#FFFFFF' },
+      cornersSquareOptions: { ...defaultDesign.cornersSquareOptions, color: '#FFFFFF' },
+      cornersDotOptions: { ...defaultDesign.cornersDotOptions, color: '#FFFFFF' },
+      backgroundOptions: { color: '#0C0A0B', isTransparent: false },
+    };
+    const result = analyzeScannability('https://arsydian.com', inverted);
+    expect(result.contrastPass).toBe(true);
+    expect(result.recommendations.some(r => r.includes('inverted'))).toBe(true);
+  });
+
+  it('measures payload size in UTF-8 bytes and flags overflow', () => {
+    expect(analyzeScannability('—', defaultDesign).payloadBytes).toBe(3);
+
+    const overflow = analyzeScannability('x'.repeat(2400), defaultDesign);
+    expect(overflow.score).toBe(0);
+    expect(overflow.recommendations[0]).toContain('Too much content');
   });
 });

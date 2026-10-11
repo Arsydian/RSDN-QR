@@ -93,8 +93,6 @@ export interface LogoOptions {
 
 /** Complete visual design configuration */
 export interface QrDesignConfig {
-  width: number;
-  height: number;
   margin: number;
   errorCorrectionLevel: ErrorCorrectionLevel;
   dotsOptions: DotsOptions;
@@ -214,12 +212,12 @@ export type HealthRating = 'excellent' | 'good' | 'warning' | 'critical';
 export interface ScannabilityResult {
   score: number; // 0 - 100
   rating: HealthRating;
-  contrastRatio: number; // WCAG contrast e.g. 7.5:1
+  contrastRatio: number; // Weakest WCAG contrast of any code color against the background, e.g. 7.5:1
   contrastPass: boolean;
   logoSafe: boolean;
-  logoOcclusionPercent: number;
+  logoOcclusionPercent: number; // Share of modules hidden by the logo
   dataDensitySafe: boolean;
-  characterCount: number;
+  payloadBytes: number; // Encoded payload size (UTF-8 bytes)
   recommendations: string[];
 }
 
