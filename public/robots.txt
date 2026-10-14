@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://qr.arsydian.com/sitemap.xml
+# Lets arsydian.com's sitemap list this subdomain (sitemaps.org cross-submission)
+Sitemap: https://arsydian.com/sitemap.xml
