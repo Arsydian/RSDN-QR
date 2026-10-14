@@ -1,0 +1,6 @@
+# Security contact for qr.arsydian.com (RFC 9116). Update Expires before it passes.
+Contact: mailto:info@arsydian.com
+Expires: 2027-10-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://qr.arsydian.com/.well-known/security.txt
+Policy: https://arsydian.com/terms#security

@@ -24,9 +24,52 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="RSDN-QR — Free, private QR code generator by Arsydian" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Structured data for search engines and AI tools: https://schema.org -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "RSDN-QR",
+        "alternateName": "RSDN-QR QR Code Generator",
+        "url": "https://qr.arsydian.com/",
+        "description": "Free, private QR code generator that runs entirely in the browser, with custom styling, logos, gradients, scannability scoring and batch CSV export.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "image": "https://qr.arsydian.com/og-image.png",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "Links, text, email, phone, SMS, Wi-Fi, vCard contacts, WhatsApp, crypto wallets and calendar events",
+          "Custom dot and corner shapes, colors and gradients",
+          "Logo overlays",
+          "Real-time scannability scoring",
+          "SVG, PNG and JPEG export up to 4096px",
+          "Batch generation from CSV"
+        ],
+        "license": "https://github.com/Arsydian/RSDN-QR/blob/main/LICENSE",
+        "publisher": {
+          "@type": "Organization",
+          "@id": "https://arsydian.com/#organization",
+          "name": "Arsydian",
+          "url": "https://arsydian.com/"
+        }
+      }
+    </script>
   </head>
   <body class="bg-ars-paper text-ars-ink antialiased selection:bg-ars-red selection:text-white">
-    <div id="root"></div>
+    <!-- The content inside #root is read by crawlers that don't run JavaScript
+         and shows while the app loads. React replaces it on startup. -->
+    <div id="root">
+      <main style="max-width: 720px; margin: 0 auto; padding: 48px 20px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6">
+        <h1 style="margin: 0; font-size: 28px; line-height: 1.2">RSDN-QR: free, private QR code generator</h1>
+        <p>Create custom, print-ready QR codes for links, text, email, phone calls, SMS, Wi-Fi networks, contact cards (vCard), WhatsApp, crypto wallets and calendar events. Add your logo, colors and gradients, check scannability as you design, and export SVG, PNG or JPEG up to 4096px, or generate a whole batch from a CSV file.</p>
+        <p>Everything runs in your browser. Nothing you enter is uploaded or stored.</p>
+        <noscript><p>The generator needs JavaScript turned on.</p></noscript>
+        <p>Built by <a href="https://arsydian.com">Arsydian</a>, IT services in Charlotte, NC.</p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

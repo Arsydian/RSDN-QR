@@ -62,7 +62,13 @@ export const Footer: React.FC = () => {
             </a>
             .
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <a href="https://arsydian.com/privacy" className="text-ars-grey-300 hover:text-ars-red transition-colors">
+              Privacy
+            </a>
+            <a href="https://arsydian.com/terms" className="text-ars-grey-300 hover:text-ars-red transition-colors">
+              Terms
+            </a>
             <span>Static Cloudflare Pages Ready</span>
             <span>Client-Side Engine</span>
           </div>
